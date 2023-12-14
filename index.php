@@ -12,10 +12,10 @@
 
     <?php
     // Database connection settings
-    $serverName = "your_server_name.database.windows.net";
-    $databaseName = "your_database_name";
-    $username = "your_username";
-    $password = "your_password";
+    $serverName = "sqlgitapp.database.windows.net";
+    $databaseName = "sqlgitapp (sqlgitapp/sqlgitapp)";
+    $username = "azuruser";
+    $password = "kawtarmdp1223@K";
 
     try {
         $conn = new PDO("sqlsrv:Server=$serverName;Database=$databaseName", $username, $password);
