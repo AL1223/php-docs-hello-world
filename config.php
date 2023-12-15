@@ -1,5 +1,5 @@
-config.php                                                                                                                                                                                                                                  <?php
-$serverName = "sqlgitapp.database.windows.net";
+<?php
+$serverName = "tcp:sqlgitapp.database.windows.net,1433";
 $connectionOptions = array(
     "Database" => "sqlgitapp",
     "Uid" => "azuruser",
