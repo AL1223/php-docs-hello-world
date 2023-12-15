@@ -7,7 +7,6 @@ $connectionOptions = array(
     "MultipleActiveResultSets" => false,
     "Encrypt" => true,
     "TrustServerCertificate" => false,
-    "ConnectionTimeout" => 30
 );
 
 // Établir la connexion à la base de données
