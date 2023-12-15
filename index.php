@@ -47,7 +47,6 @@
         }
     }
     ?>
-
     <!-- The rest of your existing HTML code... -->
 </body>
 
