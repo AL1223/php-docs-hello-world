@@ -6,7 +6,7 @@ $connectionOptions = array(
     "PWD" => "kawtarmdp1223@K",
     "MultipleActiveResultSets" => false,
     "Encrypt" => true,
-    "TrustServerCertificate" => false,
+    "TrustServerCertificate" => false
 );
 
 // Établir la connexion à la base de données
