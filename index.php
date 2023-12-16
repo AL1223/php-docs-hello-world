@@ -31,9 +31,40 @@
             if (move_uploaded_file($_FILES['image']['tmp_name'], $targetFile)) {
                 // Enregistrez le chemin de l'image et les tags dans la base de données
                 $fileName = $_FILES['image']['name'];
-                $tags = 'chat';  // Tag par défaut
 
-                // Utilisation de paramètres sécurisés
+                // Call Custom Vision for image classification
+                $imagePath = $imageDirectory . $fileName;
+                $customVisionEndpoint = "https://westeurope.api.cognitive.microsoft.com/"; // Replace with your Custom Vision endpoint
+                $customVisionPredictionKey = "9370815d85414fb5af0a825480f7a9ad"; // Replace with your Custom Vision prediction key
+                $customVisionIterationId = "a6ef9eba-344e-40d6-a2ec-bdc044aa6c87"; // Replace with your Custom Vision iteration ID
+
+                // Create a POST request to the Custom Vision prediction endpoint
+                $ch = curl_init($customVisionEndpoint . "/classify/iterations/$customVisionIterationId/image");
+                $data = array('url' => $imagePath);
+                $jsonData = json_encode($data);
+
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'Content-Type: application/json',
+                    'Prediction-Key: ' . $customVisionPredictionKey
+                ));
+
+                $result = curl_exec($ch);
+                $decodedResult = json_decode($result, true);
+
+                if ($decodedResult) {
+                    $predictedClass = $decodedResult['predictions'][0]['tagName'];
+                    echo "<p>Classified as: $predictedClass</p>";
+                } else {
+                    echo "<p>Unable to classify the image.</p>";
+                }
+
+                curl_close($ch);
+
+                // Continue with the database insertion
+                $tags = $predictedClass;  // Use the predicted class as the tag
                 $insertQuery = "INSERT INTO Images (ImageName, Class) VALUES (?, ?)";
                 $params = array($fileName, $tags);
                 $stmt = sqlsrv_prepare($conn, $insertQuery, $params);
@@ -42,7 +73,7 @@
                     die(print_r(sqlsrv_errors(), true));
                 }
 
-                echo '<p>L\'image a été téléchargée avec succès.</p>';
+                echo '<p>L\'image a été téléchargée et classifiée avec succès.</p>';
             } else {
                 echo '<p>Une erreur s\'est produite lors du téléchargement de l\'image.</p>';
             }
