@@ -34,34 +34,37 @@
 
                 // Call Custom Vision for image classification
                 $imagePath = $imageDirectory . $fileName;
+                $customVisionEndpoint = "https://predictiongitapp.cognitiveservices.azure.com/"; // Replace with your Custom Vision endpoint
+                $customVisionPredictionKey = "8b6ad715cd9344a8b1583de97f24c1ae"; // Replace with your Custom Vision prediction key
+                $customVisionIterationId = "057147e0-d1b2-4ed1-83a7-a798ecd772e2"; // Replace with your Custom Vision iteration ID
 
                 // Create a POST request to the Custom Vision prediction endpoint
-                $ch = curl_init($customVisionEndpoint . "/classify/iterations/$customVisionIterationId/image");
-                $data = array('url' => $imagePath);
-                $jsonData = json_encode($data);
+                $ch = curl_init($customVisionEndpoint . "/customvision/v3.0/Prediction/$customVisionIterationId/classify/iterations/Iteration1/image");
+                $imageData = file_get_contents($imagePath);
 
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $imageData);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                    'Content-Type: application/json',
+                    'Content-Type: application/octet-stream',
                     'Prediction-Key: ' . $customVisionPredictionKey
                 ));
 
                 $result = curl_exec($ch);
                 $decodedResult = json_decode($result, true);
 
-                if ($decodedResult) {
+                if ($decodedResult && isset($decodedResult['predictions'][0]['tagName'])) {
                     $predictedClass = $decodedResult['predictions'][0]['tagName'];
                     echo "<p>Classified as: $predictedClass</p>";
+                    $tags = $predictedClass;
                 } else {
-                    echo "<p>Unable to classify the image.</p>";
+                    echo "<p>Unable to classify the image or prediction result is invalid.</p>";
+                    $tags = 'Unknown'; // Set a default value for $tags
                 }
 
                 curl_close($ch);
 
                 // Continue with the database insertion
-                $tags = $predictedClass;  // Use the predicted class as the tag
                 $insertQuery = "INSERT INTO Images (ImageName, Class) VALUES (?, ?)";
                 $params = array($fileName, $tags);
                 $stmt = sqlsrv_prepare($conn, $insertQuery, $params);
