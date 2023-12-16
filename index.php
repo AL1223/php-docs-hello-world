@@ -1,4 +1,5 @@
 <?php
+// Include the configuration file
 include 'config.php';
 
 // Répertoire où les images seront stockées
@@ -27,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
             // Vous devez récupérer la valeur du class de Custom Vision ici
             $customVision = "chat"; // Remplacez cela par la valeur réelle obtenue de Custom Vision
 
-            $sql = "INSERT INTO Photos (ImageName, Class) VALUES (?, ?)";
+            $sql = "INSERT INTO Images (ImageName, Class) VALUES (?, ?)";
             $params = array($imageName, $customVisionClass);
             $stmt = sqlsrv_query($conn, $sql, $params);
 
@@ -69,10 +70,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     <div>
         <?php
         // Affiche toutes les images dans le répertoire
-        $images = glob($imageDirectory . '*.{jpg,jpeg,png,gif}', GLOB_BRACE);
-        foreach ($images as $image) {
-            echo '<img src="' . $image . '" alt="Album Image">';
+        $sqlSelect = "SELECT ImageName, Class FROM Images";
+        $stmtSelect = sqlsrv_query($conn, $sqlSelect);
+
+        while ($row = sqlsrv_fetch_array($stmtSelect, SQLSRV_FETCH_ASSOC)) {
+            echo '<img src="uploads/' . $row['ImageName'] . '" alt="' . $row['Class'] . '">';
         }
+
+        sqlsrv_free_stmt($stmtSelect);
         ?>
     </div>
 </body>
