@@ -34,9 +34,6 @@
 
                 // Call Custom Vision for image classification
                 $imagePath = $imageDirectory . $fileName;
-                $customVisionEndpoint = "https://westeurope.api.cognitive.microsoft.com/"; // Replace with your Custom Vision endpoint
-                $customVisionPredictionKey = "9370815d85414fb5af0a825480f7a9ad"; // Replace with your Custom Vision prediction key
-                $customVisionIterationId = "a6ef9eba-344e-40d6-a2ec-bdc044aa6c87"; // Replace with your Custom Vision iteration ID
 
                 // Create a POST request to the Custom Vision prediction endpoint
                 $ch = curl_init($customVisionEndpoint . "/classify/iterations/$customVisionIterationId/image");
